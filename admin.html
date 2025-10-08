@@ -1,36 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Great Vibes — Painel Cerimonial</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Check-in RSVP</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="header">
-    <img src="assets/monograma.svg" alt="Jackline & Samarthony" class="monograma">
-    <h1 class="title small">Painel Cerimonial</h1>
-  </header>
+<header>
+  <img src="assets/monograma.png" alt="Monograma J&S" class="monograma">
+  <h1>Admin - Check-in RSVP</h1>
+</header>
 
-  <main class="container card">
-    <label class="label" for="adminPass">Senha (admin)</label>
-    <input id="adminPass" type="password" placeholder="Senha do painel" aria-label="Senha admin">
+<div id="admin-panel">
+  <label>Buscar convidado:</label>
+  <input type="text" id="search-input" placeholder="Nome, apelido ou telefone">
+  <button id="btn-search">Buscar</button>
 
-    <label class="label" for="codigo">Código do convidado (QR) *</label>
-    <input id="codigo" placeholder="Ex: AB12CD" aria-label="Código do convidado">
+  <div id="search-result"></div>
+</div>
 
-    <div class="actions">
-      <button id="checkinBtn" class="btn" aria-label="Registrar checkin">Registrar Check-in</button>
-    </div>
+<footer>
+  Criado por Katiene Barbosa - <a href="https://wa.me/5591988198919">WhatsApp</a>
+</footer>
 
-    <div id="result" class="message" role="status" aria-live="polite"></div>
-  </main>
-
-  <footer class="footer">
-    <div>Criado por Katiene Barbosa — <a href="https://wa.me/5591988198919" target="_blank">WhatsApp</a></div>
-  </footer>
-
-  <script src="js/app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
