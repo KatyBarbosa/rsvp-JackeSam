@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Great Vibes — Painel Cerimonial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <img src="assets/monograma.svg" alt="Jackline & Samarthony" class="monograma">
+    <h1 class="title small">Painel Cerimonial</h1>
+  </header>
+
+  <main class="container card">
+    <label class="label" for="adminPass">Senha (admin)</label>
+    <input id="adminPass" type="password" placeholder="Senha do painel" aria-label="Senha admin">
+
+    <label class="label" for="codigo">Código do convidado (QR) *</label>
+    <input id="codigo" placeholder="Ex: AB12CD" aria-label="Código do convidado">
+
+    <div class="actions">
+      <button id="checkinBtn" class="btn" aria-label="Registrar checkin">Registrar Check-in</button>
+    </div>
+
+    <div id="result" class="message" role="status" aria-live="polite"></div>
+  </main>
+
+  <footer class="footer">
+    <div>Criado por Katiene Barbosa — <a href="https://wa.me/5591988198919" target="_blank">WhatsApp</a></div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

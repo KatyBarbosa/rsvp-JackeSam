@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Great Vibes — RSVP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <img src="assets/monograma.svg" alt="Jackline & Samarthony" class="monograma">
+    <h1 class="title">Great Vibes</h1>
+  </header>
+
+  <main class="container">
+    <form id="rsvpForm" class="card" autocomplete="off" novalidate>
+      <input type="hidden" id="token" name="token" aria-hidden="true">
+
+      <label class="label" for="presenca">Presença *</label>
+      <select id="presenca" name="presenca" required aria-required="true" aria-label="Presença">
+        <option value="">-- selecione --</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+        <option value="talvez">Talvez</option>
+      </select>
+
+      <label class="label" for="nome">Nome completo *</label>
+      <input id="nome" name="nome" placeholder="Seu nome" required maxlength="120" aria-required="true" aria-label="Nome completo">
+
+      <label class="label" for="apelido">Apelido (opcional)</label>
+      <input id="apelido" name="apelido" placeholder="Como prefere ser chamado" maxlength="40" aria-label="Apelido">
+
+      <label class="label" for="telefone">Telefone (WhatsApp) *</label>
+      <input id="telefone" name="telefone" placeholder="(xx) xxxxx-xxxx" required inputmode="tel" maxlength="20" aria-required="true" aria-label="Telefone">
+
+      <label class="label" for="quantidade">Quantidade de pessoas (incluindo você) *</label>
+      <input id="quantidade" name="quantidade" type="number" min="1" value="1" required aria-required="true" inputmode="numeric">
+
+      <div id="acompanhantesBlock" class="hidden" aria-hidden="true">
+        <label class="label" for="acompanhantes">Acompanhantes (nomes)</label>
+        <input id="acompanhantes" name="acompanhantes" placeholder="Ex: João, Maria" maxlength="200" aria-label="Acompanhantes">
+
+        <label class="label" for="adultoCrianca">Adulto ou criança? *</label>
+        <select id="adultoCrianca" name="adulto_crianca" aria-label="Adulto ou criança">
+          <option value="adulto">Adulto</option>
+          <option value="crianca">Criança</option>
+        </select>
+
+        <div id="idadeBlock" class="hidden" aria-hidden="true">
+          <label class="label" for="idadeCrianca">Idade da criança *</label>
+          <input id="idadeCrianca" name="idade_crianca" type="number" min="0" inputmode="numeric" aria-label="Idade da criança">
+        </div>
+      </div>
+
+      <label class="label" for="mesa">Mesa (se souber)</label>
+      <input id="mesa" name="mesa" placeholder="Ex: Mesa 4" maxlength="40" aria-label="Mesa">
+
+      <div class="actions">
+        <button id="submitBtn" type="submit" class="btn" aria-label="Confirmar RSVP">Confirmar</button>
+      </div>
+
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+
+      <div id="qrWrap" class="hidden" aria-hidden="true">
+        <p class="small">Apresente este QR na entrada:</p>
+        <img id="qrImg" alt="QR Code">
+        <div class="qr-actions">
+          <a id="saveQr" download="qrcode.png" class="btn-outline">Salvar imagem</a>
+          <a id="whatsappLink" target="_blank" class="btn">Enviar via WhatsApp</a>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <footer class="footer">
+    <div>Criado por Katiene Barbosa — <a href="https://wa.me/5591988198919" target="_blank">WhatsApp</a></div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
