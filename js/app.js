@@ -1,165 +1,116 @@
-// Config: insira a URL do seu Web App do Google Apps Script aqui
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwk4adJpadf-8fh1JHBffy0dG36cal3XRHotPW-JJNCAOSYZ5JSlgCWuuwoaKIrQmJD/exec';
+document.addEventListener("DOMContentLoaded", () => {
+  const presencaRadios = document.querySelectorAll('input[name="presenca"]');
+  const camposSim = document.getElementById("campos-sim");
+  const camposNao = document.getElementById("campos-nao");
+  const quantidadeInput = document.getElementById("quantidade");
+  const acompanhantesContainer = document.getElementById("acompanhantes-container");
+  const form = document.getElementById("rsvp-form");
+  const mensagemFinal = document.getElementById("mensagem-final");
 
-// Helpers
-function qs(name){
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
-}
-
-function sanitizeClient(str){
-  if(!str) return '';
-  return String(str).replace(/[\u0000-\u001F\u007F<>]/g, '').trim();
-}
-
-// --- Form logic ---
-document.addEventListener('DOMContentLoaded',()=>{
-  const tokenInput = document.getElementById('token');
-  const tokenFromUrl = qs('t');
-  if(tokenInput) tokenInput.value = tokenFromUrl || '';
-
-  const presenca = document.getElementById('presenca');
-  const acompanhantesBlock = document.getElementById('acompanhantesBlock');
-  const quantidade = document.getElementById('quantidade');
-  const adultoCrianca = document.getElementById('adultoCrianca');
-  const idadeBlock = document.getElementById('idadeBlock');
-  const acompanhantesInput = document.getElementById('acompanhantes');
-
-  if(presenca){
-    presenca.addEventListener('change',()=>{
-      const v = presenca.value;
-      if(v==='sim' || v==='talvez'){
-        acompanhantesBlock.classList.remove('hidden');
-        acompanhantesBlock.setAttribute('aria-hidden','false');
-        quantidade.setAttribute('required','required');
+  presencaRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (radio.value === "Sim") {
+        camposSim.style.display = "block";
+        camposNao.style.display = "none";
+        buildAcompanhantesFields(quantidadeInput.value);
       } else {
-        acompanhantesBlock.classList.add('hidden');
-        acompanhantesBlock.setAttribute('aria-hidden','true');
-        quantidade.removeAttribute('required');
+        camposSim.style.display = "none";
+        camposNao.style.display = "block";
       }
     });
-  }
+  });
 
-  if(adultoCrianca){
-    adultoCrianca.addEventListener('change',()=>{
-      if(adultoCrianca.value==='crianca'){
-        idadeBlock.classList.remove('hidden');
-        idadeBlock.setAttribute('aria-hidden','false');
-        document.getElementById('idadeCrianca').setAttribute('required','required');
-      }
-      else {
-        idadeBlock.classList.add('hidden');
-        idadeBlock.setAttribute('aria-hidden','true');
-        document.getElementById('idadeCrianca').removeAttribute('required');
-      }
-    });
-  }
+  quantidadeInput.addEventListener("input", () => {
+    buildAcompanhantesFields(quantidadeInput.value);
+  });
 
-  const form = document.getElementById('rsvpForm');
-  if(form){
-    form.addEventListener('submit',async(e)=>{
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true; btn.textContent = 'Enviando...';
-      clearMessage();
+  function buildAcompanhantesFields(qtd) {
+    acompanhantesContainer.innerHTML = "";
+    qtd = parseInt(qtd);
+    if (qtd > 1) {
+      for (let i = 1; i < qtd; i++) {
+        const div = document.createElement("div");
+        div.classList.add("acompanhante");
 
-      // gather and sanitize
-      const payload = {
-        action:'submit',
-        token: sanitizeClient(document.getElementById('token').value || ''),
-        nome: sanitizeClient(document.getElementById('nome').value),
-        apelido: sanitizeClient(document.getElementById('apelido').value),
-        telefone: sanitizeClient(document.getElementById('telefone').value),
-        presenca: sanitizeClient(document.getElementById('presenca').value),
-        quantidade: sanitizeClient(document.getElementById('quantidade').value || '1'),
-        acompanhantes: sanitizeClient(acompanhantesInput ? acompanhantesInput.value : ''),
-        adulto_crianca: sanitizeClient(document.getElementById('adultoCrianca') ? document.getElementById('adultoCrianca').value : 'adulto'),
-        idade_crianca: sanitizeClient(document.getElementById('idadeCrianca') ? document.getElementById('idadeCrianca').value : ''),
-        mesa: sanitizeClient(document.getElementById('mesa').value)
-      };
+        div.innerHTML = `
+          <label>Nome do acompanhante ${i}:</label>
+          <input type="text" class="acomp-nome" required>
+          <label>Tipo:</label>
+          <input type="radio" name="tipo${i}" value="Adulto" required> Adulto
+          <input type="radio" name="tipo${i}" value="Criança" required> Criança
+          <div class="idade-crianca" style="display:none;">
+            <label>Idade:</label>
+            <input type="number" class="acomp-idade">
+          </div>
+        `;
+        acompanhantesContainer.appendChild(div);
 
-      // client-side validation (quick)
-      if(!payload.token){ showMessage('Token ausente. Use o link que recebeu.'); btn.disabled=false; btn.textContent='Confirmar'; return; }
-      if(!payload.nome){ showMessage('Nome é obrigatório.'); btn.disabled=false; btn.textContent='Confirmar'; return; }
-      if(!payload.telefone){ showMessage('Telefone é obrigatório.'); btn.disabled=false; btn.textContent='Confirmar'; return; }
-      if(!payload.presenca){ showMessage('Selecione presença.'); btn.disabled=false; btn.textContent='Confirmar'; return; }
-      if((payload.presenca==='sim' || payload.presenca==='talvez') && (!payload.quantidade || Number(payload.quantidade) < 1)){ showMessage('Informe a quantidade de pessoas.'); btn.disabled=false; btn.textContent='Confirmar'; return; }
-      if(payload.adulto_crianca==='crianca' && payload.idade_crianca===''){ showMessage('Informe a idade da criança.'); btn.disabled=false; btn.textContent='Confirmar'; return; }
-
-      try{
-        const res = await fetch(GAS_URL,{
-          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+        const tipoRadios = div.querySelectorAll(`input[name="tipo${i}"]`);
+        tipoRadios.forEach(r => {
+          r.addEventListener("change", () => {
+            const idadeDiv = div.querySelector(".idade-crianca");
+            idadeDiv.style.display = r.value === "Criança" ? "block" : "none";
+          });
         });
-        if(!res.ok){ throw new Error('Resposta inválida do servidor'); }
-        const data = await res.json();
-        if(data.success){
-          showConfirmation(payload.presenca,data,payload.nome);
-        } else {
-          showMessage(data.error || 'Erro ao enviar.');
-        }
-      }catch(err){
-        console.error(err);
-        showMessage('Erro de rede ou servidor. Verifique sua conexão e tente novamente.');
       }
-
-      btn.disabled = false; btn.textContent = 'Confirmar';
-    });
+    }
   }
 
-  // admin
-  const checkinBtn = document.getElementById('checkinBtn');
-  if(checkinBtn){
-    checkinBtn.addEventListener('click',async ()=>{
-      const pass = document.getElementById('adminPass').value;
-      const codigo = document.getElementById('codigo').value.trim();
-      if(!pass || !codigo) return alert('Senha e código são obrigatórios');
-      try{
-        const res = await fetch(GAS_URL,{
-          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'checkin', admin_pass:pass, codigo})
-        });
-        const data = await res.json();
-        if(data.success){
-          document.getElementById('result').textContent = `Check-in registrado: ${data.nome} — ${data.quantidade} pessoas — Mesa: ${data.mesa || '—'}`;
-        } else {
-          document.getElementById('result').textContent = data.error || 'Erro no check-in';
-        }
-      }catch(e){document.getElementById('result').textContent = 'Erro de rede'}
-    });
-  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
+    const presenca = document.querySelector('input[name="presenca"]:checked')?.value;
+    if (!presenca) {
+      alert("Escolha sua presença.");
+      return;
+    }
+
+    let payload = { presenca };
+
+    if (presenca === "Sim") {
+      payload.nome = document.getElementById("nome").value.trim();
+      payload.apelido = document.getElementById("apelido").value.trim();
+      payload.telefone = sanitizeTelefone(document.getElementById("telefone").value);
+      payload.quantidade = document.getElementById("quantidade").value;
+      payload.acompanhantes = [];
+
+      const acompanhantesDivs = document.querySelectorAll(".acompanhante");
+      acompanhantesDivs.forEach(div => {
+        const nome = div.querySelector(".acomp-nome").value.trim();
+        const tipo = div.querySelector(`input[name="${div.querySelector(".acomp-nome").name}"]:checked`)?.value;
+        const idade = div.querySelector(".acomp-idade")?.value.trim();
+        payload.acompanhantes.push({ nome, tipo, idade });
+      });
+
+    } else {
+      payload.nome = document.getElementById("nome-nao").value.trim();
+      payload.apelido = document.getElementById("apelido-nao").value.trim();
+      payload.telefone = sanitizeTelefone(document.getElementById("telefone-nao").value);
+    }
+
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxGE-cpLAcZfHMIR7WkfmpoltFFU8q21j-NKGNxFHiqM66vAwNtt_WpGV-mB9eKVs4e/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "submit", ...payload })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        mensagemFinal.innerHTML = presenca === "Sim"
+          ? `Uhuuul! 🎉 Obrigado por confirmar sua presença! Contagem regressiva ativada 💕.<br><img src="${data.qr_url}" alt="QR Code">`
+          : "Lamentamos que não vá poder comparecer — obrigado por avisar.";
+        form.style.display = "none";
+      } else {
+        alert(data.error || "Erro no envio");
+      }
+    } catch (err) {
+      alert("Erro de conexão.");
+      console.error(err);
+    }
+  });
+
+  function sanitizeTelefone(telefone) {
+    return telefone.replace(/\D/g, "");
+  }
 });
-
-function showMessage(text){
-  const m = document.getElementById('message');
-  if(m){m.textContent = text; m.classList.remove('hidden'); m.style.display='block';}
-}
-
-function clearMessage(){
-  const m = document.getElementById('message');
-  if(m){m.textContent=''; m.classList.add('hidden'); m.style.display='none';}
-}
-
-function showConfirmation(presenca,data,nome){
-  const m = document.getElementById('message');
-  const qrWrap = document.getElementById('qrWrap');
-  const qrImg = document.getElementById('qrImg');
-  const saveQr = document.getElementById('saveQr');
-  const whatsappLink = document.getElementById('whatsappLink');
-
-  if(presenca==='sim'){
-    m.innerHTML = 'Uhuuul! 🎉 Obrigado por confirmar sua presença! Estamos preparando tudo com muito carinho para receber você nesse dia tão especial. Contagem regressiva ativada 💕.';
-  } else if(presenca==='nao'){
-    m.innerHTML = 'Lamentamos que não vá poder comparecer — obrigado por avisar.';
-  } else {
-    m.innerHTML = 'Obrigado — sua resposta foi registrada. Aguardamos confirmação final.';
-  }
-
-  if(data.qr_url){
-    qrWrap.classList.remove('hidden');
-    qrWrap.setAttribute('aria-hidden','false');
-    qrImg.src = data.qr_url;
-    saveQr.href = data.qr_url;
-    const text = encodeURIComponent(`Confirmação: ${nome} - ${presenca}. Código: ${data.codigo}`) + '%0A' + encodeURIComponent(data.qr_url);
-    whatsappLink.href = `https://wa.me/?text=${text}`;
-  }
-}
